@@ -1,5 +1,6 @@
 import os
 import pickle
+from datetime import datetime
 
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
@@ -12,9 +13,59 @@ def main():
 
     playlist = uploads_playlist_id(youtube)
     videos = playlist_videos_ids(youtube, playlist)
-    comments = pinned_comments_ids(youtube, videos)
+    update_ratings(youtube, videos)
 
-    print(comments)
+def update_ratings(youtube, videos):
+    """Updates the ratings of all videos by appending at the beginning of the
+    description of each video the like/dislike stats for the video"""
+    count = 0
+    print('Updating video ratings...')
+    for vid in videos:
+        request = youtube.videos().list(
+            part="snippet, statistics",
+            id=vid
+        )
+        video = request.execute()
+        title = video['items'][0]['snippet']['title']
+        description = video['items'][0]['snippet']['description']
+        likes = int(video['items'][0]['statistics']['likeCount'])
+        dislikes = int(video['items'][0]['statistics']['dislikeCount'])
+
+        ratio = int(10 * likes / (likes + dislikes))
+        rate_bar = ratio * '🟦' + (10 - ratio) * '🟥' + '\n'
+        likes = str(likes) + (7 - len(str(likes))) * ' '
+        dislikes = str(dislikes) + (7 - len(str(dislikes))) * ' '
+        rate_count = '👍 ' + likes + '👎 ' + dislikes + '\n'
+        time = datetime.utcnow().strftime("%b/%d/%Y at %H:%M UTC")
+        update = 'Last updated on ' + time
+
+        new_description = ''
+        if description[0] != '👍':
+            new_description = rate_count + rate_bar + update + '\n\n' + description
+        else:
+            description = description.split("\n",3)[3]
+            new_description = rate_count + rate_bar + update + '\n' + description
+
+        request = youtube.videos().update(
+            part="snippet",
+            body={
+              "id": vid,
+              "snippet": {
+                "categoryId": 22,
+                "description": new_description,
+                "title": title
+              }
+            }
+        )
+        request.execute()
+
+        count += 1
+        done = count / len(videos) * 100
+        progress_bar = int(done / 2) * '█' + (50 - int(done / 2)) * '░'
+        done_perc = f' {done:.2f}% '
+        progress_bar = progress_bar[:21] + done_perc + progress_bar[29:]
+        print(progress_bar, end='\r')
+    print('Finished updating ratings!                        ')
 
 def pinned_comments_ids(youtube, videos):
     """Returns a list of IDs coresponding to all pinned comments in 'videos'
@@ -27,9 +78,9 @@ def pinned_comments_ids(youtube, videos):
         request = youtube.commentThreads().list(part='snippet', videoId=vid)
         response = request.execute()
         comms.append(response['items'][0]['snippet']['topLevelComment']['id'])
-
+        
         done = len(comms) / len(videos) * 100
-        progress_bar = int(done /2) * '█' + (50 - int(done /2)) * '░'
+        progress_bar = int(done / 2) * '█' + (50 - int(done / 2)) * '░'
         done_perc = f' {done:.2f}% '
         progress_bar = progress_bar[:21] + done_perc + progress_bar[29:]
         print(progress_bar, end='\r')
