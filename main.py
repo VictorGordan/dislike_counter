@@ -36,7 +36,7 @@ def update_ratings(youtube, videos):
         likes = str(likes) + (7 - len(str(likes))) * ' '
         dislikes = str(dislikes) + (7 - len(str(dislikes))) * ' '
         rate_count = '👍 ' + likes + '👎 ' + dislikes + '\n'
-        time = datetime.utcnow().strftime("%b/%d/%Y at %H:%M UTC")
+        time = datetime.utcnow().strftime("%d/%b/%Y at %H:%M UTC")
         update = 'Last updated on ' + time
 
         new_description = ''
