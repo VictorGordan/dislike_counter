@@ -65,7 +65,7 @@ def update_ratings(youtube, videos):
         done_perc = f' {done:.2f}% '
         progress_bar = progress_bar[:21] + done_perc + progress_bar[29:]
         print(progress_bar, end='\r')
-    print('Finished updating ratings!                        ')
+    print('Finished updating ratings!                         ')
 
 def pinned_comments_ids(youtube, videos):
     """Returns a list of IDs coresponding to all pinned comments in 'videos'
