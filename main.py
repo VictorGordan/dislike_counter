@@ -9,7 +9,11 @@ import google.auth.transport.requests
 
 
 def main():
-    youtube = authentificate_user()
+    try:
+        youtube = authentificate_user()
+    except:
+        os.remove("token.pickle")
+        youtube = authentificate_user()
 
     playlist = uploads_playlist_id(youtube)
     videos = playlist_videos_ids(youtube, playlist)
