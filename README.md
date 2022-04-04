@@ -1,7 +1,6 @@
 # Usage Tutorial
 
-First make sure to add: client_secrets.json in your working directory
-.It should look something like this
+First make sure to add: client_secrets.json in your working directory. It should look something like this:
 ```json
 {
     "installed":
