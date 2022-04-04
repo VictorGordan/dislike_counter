@@ -1,6 +1,6 @@
 # Usage Tutorial
 
-Make sure to add: client_secrets.json
+First make sure to add: client_secrets.json in your working directory
 It should look something like this
 ```json
 {
@@ -16,3 +16,5 @@ It should look something like this
     }
 }
 ```
+
+Simply run the "main.py" file. A new tab should then open in your browser asking you for access to your YouTube channel. You need to accept all the stuff it asks you for. Then the script will automatically add the like/dislike stats to the description of all your video. Enjoy :)
